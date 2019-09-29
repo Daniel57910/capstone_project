@@ -23,7 +23,7 @@ def main():
 
   temperature_data = temperature_data.filter(
     (temperature_data.Country == 'United States') & 
-    (temperature_data.AverageTemperature == 'null')
+    temperature_data.dt.contains('2013')
    )
 
   logger.error(temperature_data.show(10))
