@@ -35,10 +35,14 @@ dag = DAG(
 # )
 
 create_demographic_dimension = BashOperator(
-  task_id='load_dimensions_data_into_rdd',
+  task_id='load_demographic_summary_of_states_into_rdd',
   bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit {SPARK_PROJECT_PATH}/city_demographic_data.py',
   dag=dag
 )
+
+# create_weather_dimension = BashOperator(
+#   task_id='lo'
+# )
 
 # sync_dataset >> unzip_dataset
 
