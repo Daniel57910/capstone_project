@@ -36,7 +36,7 @@ dag = DAG(
 
 create_demographic_dimension = BashOperator(
   task_id='load_dimensions_data_into_rdd',
-  bash_command=SOURCE_VIRTUAL_ENV + f'spark-submit {SPARK_PROJECT_PATH}/immigration_data.py',
+  bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit {SPARK_PROJECT_PATH}/city_demographic_data.py',
   dag=dag
 )
 

@@ -1,0 +1,19 @@
+{
+  "datasetid": "us-cities-demographics",
+  "recordid": "85458783ecf5da6572ee00e7120f68eff4fd0d61",
+  "fields": {
+    "count": 76402,
+    "city": "Newark",
+    "number_of_veterans": 5829,
+    "male_population": 138040,
+    "foreign_born": 86253,
+    "average_household_size": 2.73,
+    "median_age": 34.6,
+    "state": "New Jersey",
+    "race": "White",
+    "total_population": 281913,
+    "state_code": "NJ",
+    "female_population": 143873
+  },
+  "record_timestamp": "1970-01-01T01:00:00+01:00"
+}
