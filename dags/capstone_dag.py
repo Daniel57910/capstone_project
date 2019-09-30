@@ -22,21 +22,21 @@ default_args = {
 dag = DAG(
   'sparkify_dag', default_args=default_args, description='First Dag', schedule_interval='@hourly', catchup=False)
 
-# sync_dataset= BashOperator(
-#   task_id='sync_dataset',
-#   bash_command='aws s3 sync s3://capstone-dmiller-bucket /mnt1',
-#   dag=dag
-# )
+sync_dataset= BashOperator(
+  task_id='sync_dataset',
+  bash_command='aws s3 sync s3://capstone-dmiller-bucket /mnt1',
+  dag=dag
+)
 
-# unzip_dataset = BashOperator(
-#   task_id='unzip_dataset',
-#   bash_command='unzip /mnt1/data.zip -d /mnt1/',
-#   dag=dag
-# )
+unzip_dataset = BashOperator(
+  task_id='unzip_dataset',
+  bash_command='unzip /mnt1/data.zip -d /mnt1/',
+  dag=dag
+)
 
 create_demographic_dimension = BashOperator(
   task_id='load_demographic_summary_of_states_into_rdd',
-  bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit {SPARK_PROJECT_PATH}/city_demographic_data.py',
+  bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit {SPARK_PROJECT_PATH}/load_city_and_temperature_dimensions.py',
   dag=dag
 )
 
@@ -44,6 +44,4 @@ create_demographic_dimension = BashOperator(
 #   task_id='lo'
 # )
 
-# sync_dataset >> unzip_dataset
-
-create_demographic_dimension
+sync_dataset >> unzip_dataset >> create_demographic_dimension
