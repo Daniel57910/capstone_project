@@ -37,6 +37,7 @@ def main():
     us_cities_rdd.fields.female_population.alias('female_population'),
     us_cities_rdd.fields.race.alias('race')
   )
+
   temperature_data = spark.read.csv(
     CORE_PATH + '/climate-change-earth-surface-temperature-data/GlobalLandTemperaturesByState.csv',
     header=True,
@@ -63,7 +64,6 @@ def main():
   temperature_data.write.mode('overwrite').partitionBy('state_code', 'state').parquet(
     CORE_PATH + '/dimension_tables/d_temperature'
   )
- 
 
   spark.stop()
 
