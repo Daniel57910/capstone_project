@@ -16,8 +16,6 @@ eggs/
 .eggs/
 lib64/
 ssh_cluster
-*.pem
-*.txt
 
 parts/
 sdist/
@@ -26,7 +24,6 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-*.json
 MANIFEST
 
 # PyInstaller
