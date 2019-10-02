@@ -34,8 +34,8 @@ unzip_dataset = BashOperator(
   dag=dag
 )
 
-create_demographic_dimension = BashOperator(
-  task_id='load_demographic_summary_of_states_into_rdd',
+generate_dimension_data = BashOperator(
+  task_id='generate_dimension_parquet_files',
   bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit {SPARK_PROJECT_PATH}/load_city_and_temperature_dimensions.py',
   dag=dag
 )
@@ -44,4 +44,4 @@ create_demographic_dimension = BashOperator(
 #   task_id='lo'
 # )
 
-sync_dataset >> unzip_dataset >> create_demographic_dimension
+sync_dataset >> unzip_dataset >> generate_dimension_data
