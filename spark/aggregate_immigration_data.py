@@ -35,13 +35,11 @@ def return_rdd_column_subset(dataset):
 
 def create_sex_distribution_frame(logger, all_data, female_data):
  
-  female_data = female_data.toDF('f_state', 'f_arrival_month', 'f_count') 
   distribution_frame = all_data.join(
     female_data,
     [all_data.state == female_data.f_state, all_data.arrival_month == female_data.f_arrival_month]
   ).select('state', 'arrival_month', 'count', 'f_count')
 
-  logger.error('DISTRIBUTION FRAME =>')
   logger.error(distribution_frame.show(50))
   distribution_frame = distribution_frame.withColumn('female_distribution', distribution_frame['f_count'] / distribution_frame['count'])
 
@@ -49,10 +47,8 @@ def create_sex_distribution_frame(logger, all_data, female_data):
 
 def create_female_distribution(logger, dataset):
 
-    logger.error(dataset.show(10))
     dataset = dataset.filter(dataset.gender == 'F').groupBy('state', 'arrival_month').count()
     dataset = dataset.toDF('f_state', 'f_arrival_month', 'f_count')
-    logger.error(dataset.show(10))
     return dataset
 
 def main():
@@ -68,32 +64,24 @@ def main():
 
   file_finder = FileFinder(CORE_PATH + '/immigration-data/', '*.sas7bdat')
 
-  immigration_data_sets = map(
+  immigration_data_set = map(
     lambda file: generate_immigration_rdd(spark, file), file_finder.return_file_names()
   )
 
-  immigration_data_sets = list(map(return_rdd_column_subset, immigration_data_sets))
-  immigration_data = unionAll(*immigration_data_sets) 
-  logger.error(immigration_data.show(40))
+  immigration_data_set = list(map(return_rdd_column_subset, immigration_data_set))
+  immigration_data = unionAll(*immigration_data_set) 
 
-
-
-
-
-  # age_aggregate = map(lambda dataset: dataset.groupBy('state', 'arrival_month').avg('age'), immigration_data_sets)
-  # sex_aggregate = map(lambda dataset: dataset.groupBy('state', 'arrival_month').count(), immigration_data_sets)
+  age_aggregate = immigration_data.groupBy('state', 'arrival_month').avg('age')
+  sex_aggregate = immigration_data.groupBy('state', 'arrival_month').count()
+  female_aggregate = create_female_distribution(logger, immigration_data)
+  sex_distribution = create_sex_distribution_frame(logger, sex_aggregate, female_aggregate)
   
-
-  # example = list(immigration_data_sets)[0]
-  # logger.info(example.show(10))
-
-  # female_aggregate = map(
-    # lambda dataset: create_female_distribution(logger, dataset), immigration_data_sets
-  # )
-
-  # example_sex = list(sex_aggregate)[2]
-  # example_all = list(immigration_data_sets)[0]
-  # example_female = list(female_aggregate)[0]
+  age_aggregate = age_aggregate.toDF('age_state', 'age_arrival_month', 'age')
+  
+  age_and_sex_join = sex_distribution.join(
+    age_aggregate,
+    [sex_distribution.state == age_aggregate.age_state, sex_distribution.arrival_month == age_aggregate.age_arrival_month]
+  ).drop('age_state', 'age_arrival_month')
 
   # logger.error(example_sex.show(10))
   # logger.error(example_all.show(10))
