@@ -35,15 +35,28 @@ unzip_dataset = BashOperator(
 )
 
 generate_city_and_temperature_dimension_data = BashOperator(
-  task_id='generate_dimension_parquet_files',
+  task_id='generate_city_and_temperature_dimension_files',
   bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit {SPARK_PROJECT_PATH}/load_city_and_temperature_dimensions.py',
   dag=dag
 )
 
 generate_immigration_dimension_data = BashOperator(
-  task_id='generate_dimension_parquet_files',
-  bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit --packages saurfang:spark-sas7bdat:2.0.0-s_2.10 {SPARK_PROJECT_PATH}/load_city_and_temperature_dimensions.py',
+  task_id='generate_immigration_dimension_files',
+  bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit --packages saurfang:spark-sas7bdat:2.0.0-s_2.10 {SPARK_PROJECT_PATH}/aggregate_immigration_data.py',
   dag=dag
 )
 
-sync_dataset >> unzip_dataset >> [generate_city_and_temperature_dimension_data, generate_immigration_dimension_data] 
+generate_immigration_demographic_summary = BashOperator(
+  task_id='generate_fact_summary_data_of_immigration_temperature_demographics',
+  bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit --packages {SPARK_PROJECT_PATH}/create_immigration_demographic_summary.py',
+  dag=dag
+)
+
+fact_data_quality_check = BashOperator(
+  task_id='fact_data_quality_check',
+  bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit --packages saurfang:spark-sas7bdat:2.0.0-s_2.10 {SPARK_PROJECT_PATH}/fact_data_quality_check.py',
+  dag=dag
+)
+
+sync_dataset >> unzip_dataset >> [generate_city_and_temperature_dimension_data, generate_immigration_dimension_data] >> generate_immigration_demographic_summary
+generate_immigration_demographic_summary >> fact_data_quality_check
