@@ -34,14 +34,16 @@ unzip_dataset = BashOperator(
   dag=dag
 )
 
-generate_dimension_data = BashOperator(
+generate_city_and_temperature_dimension_data = BashOperator(
   task_id='generate_dimension_parquet_files',
   bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit {SPARK_PROJECT_PATH}/load_city_and_temperature_dimensions.py',
   dag=dag
 )
 
-# create_weather_dimension = BashOperator(
-#   task_id='lo'
-# )
+generate_immigration_dimension_data = BashOperator(
+  task_id='generate_dimension_parquet_files',
+  bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit --packages saurfang:spark-sas7bdat:2.0.0-s_2.10 {SPARK_PROJECT_PATH}/load_city_and_temperature_dimensions.py',
+  dag=dag
+)
 
-sync_dataset >> unzip_dataset >> generate_dimension_data
+sync_dataset >> unzip_dataset >> [generate_city_and_temperature_dimension_data, generate_immigration_dimension_data] 
