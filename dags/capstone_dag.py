@@ -46,7 +46,7 @@ generate_immigration_dimension_data = BashOperator(
 
 generate_immigration_demographic_summary = BashOperator(
   task_id='generate_fact_summary_data_of_immigration_temperature_demographics',
-  bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit {SPARK_PROJECT_PATH}/create_immigration_demographic_summary.py',
+  bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit {SPARK_PROJECT_PATH}/create_immigration_demography_summary.py',
   dag=dag
 )
 
