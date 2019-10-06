@@ -22,13 +22,8 @@ def main():
 
   spark.sparkContext.setLogLevel("ERROR")
 
-  us_cities_rdd = RDDCreator(
-    'city-demographic-data',
-    [CORE_PATH + '/us-cities-demographics.json'],
-    spark
-  )
+  us_cities_rdd = spark.read.json(CORE_PATH + '/us-cities-demographics.json')
 
-  us_cities_rdd = us_cities_rdd.create_rdd_from_path()
   us_cities_rdd = us_cities_rdd.select(
     us_cities_rdd.fields.state_code.alias('state_code'),
     us_cities_rdd.fields.state.alias('state'),

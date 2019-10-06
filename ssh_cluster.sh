@@ -1,1 +1,1 @@
-ssh -i ~/Documents/GitHub/capstone_project/sparkify-lake-2.pem hadoop@ec2-18-207-101-107.compute-1.amazonaws.com
+ssh -i ~/Documents/GitHub/capstone_project/sparkify-lake-2.pem hadoop@ec2-3-82-64-38.compute-1.amazonaws.com
