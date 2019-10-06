@@ -40,7 +40,6 @@ def create_sex_distribution_frame(logger, all_data, female_data):
     [all_data.state == female_data.f_state, all_data.arrival_month == female_data.f_arrival_month]
   ).select('state', 'arrival_month', 'count', 'f_count')
 
-  logger.error(distribution_frame.show(50))
   distribution_frame = distribution_frame.withColumn('female_distribution', distribution_frame['f_count'] / distribution_frame['count'])
 
   return distribution_frame
@@ -75,11 +74,15 @@ def main():
   sex_aggregate = immigration_data.groupBy('state', 'arrival_month').count()
   female_aggregate = create_female_distribution(logger, immigration_data)
   sex_distribution = create_sex_distribution_frame(logger, sex_aggregate, female_aggregate)
-  
+  age_aggregate = age_aggregate.toDF('age_state', 'age_arrival_month', 'age')  
+
   age_and_sex_join = sex_distribution.join(
-    age_aggregate.toDF('age_state', 'age_arrival_month', 'age')
+    age_aggregate,
     [sex_distribution.state == age_aggregate.age_state, sex_distribution.arrival_month == age_aggregate.age_arrival_month]
   ).drop('age_state', 'age_arrival_month')
+
+  age_aggregate = age_aggregate.toDF('state', 'arrival_month', 'age')
+  female_aggregate = female_aggregate.toDF('state', 'arrival_month', 'count')
 
   immigration_data.write.mode('overwrite').partitionBy('state', 'arrival_month').parquet(CORE_PATH + '/dimension_tables/d_immigration')
   age_aggregate.write.mode('overwrite').partitionBy('state', 'arrival_month').parquet(CORE_PATH + '/dimension_tables/d_age_aggregate')
