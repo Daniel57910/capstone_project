@@ -82,11 +82,10 @@ def main():
   ).drop('age_state', 'age_arrival_month')
 
   age_aggregate = age_aggregate.toDF('state', 'arrival_month', 'age')
-  female_aggregate = female_aggregate.toDF('state', 'arrival_month', 'count')
-
+  
   immigration_data.write.mode('overwrite').partitionBy('state', 'arrival_month').parquet(CORE_PATH + '/dimension_tables/d_immigration')
   age_aggregate.write.mode('overwrite').partitionBy('state', 'arrival_month').parquet(CORE_PATH + '/dimension_tables/d_age_aggregate')
-  sex_aggregate.write.mode('overwrite').partitionBy('state', 'arrival_month').parquet(CORE_PATH + '/dimension_tables/d_sex_aggregate')
+  sex_aggregate.write.mode('overwrite').partitionBy('f_state', 'f_arrival_month').parquet(CORE_PATH + '/dimension_tables/d_sex_aggregate')
   female_aggregate.write.mode('overwrite').partitionBy('state', 'arrival_month').parquet(CORE_PATH + '/dimension_tables/d_female_aggregate')
   sex_distribution.write.mode('overwrite').partitionBy('state', 'arrival_month').parquet(CORE_PATH + '/dimension_tables/d_sex_distribution')
   age_and_sex_join.write.mode('overwrite').partitionBy('state', 'arrival_month').parquet(CORE_PATH + '/dimension_tables/d_age_and_sex_join')
