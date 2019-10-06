@@ -5,6 +5,7 @@ from lib.rdd_creator import RDDCreator
 import logging
 import pyspark.sql.functions as f 
 
+
 CORE_PATH = '/mnt1/data'
 
 def generate_immigration_rdd(spark, dataset):
@@ -27,14 +28,17 @@ def return_rdd_column_subset(dataset):
 
   return dataset
 
-def create_sex_distribution_frame(all_data, female_data):
-
+def create_sex_distribution_frame(logger, all_data, female_data):
+ 
+  female_data = female_data.toDF('f_state', 'f_arrival_month', 'f_count') 
   distribution_frame = all_data.join(
-    female_data.withColumnRenamed('count', 'female_count'),
-    [all_data.state == female_data.state, all_data.arrival_month == female_data.arrival_month]
-  ).drop('female_data.state', 'female_data.arrival_month')
+    female_data,
+    [all_data.state == female_data.f_state, all_data.arrival_month == female_data.f_arrival_month]
+  ).select('state', 'arrival_month', 'count', 'f_count')
 
-  distribution_frame = distribution_frame.withColumn('female_distribution', distribution_frame.female_count / distribution_frame.count)
+  logger.error('DISTRIBUTION FRAME =>')
+  logger.error(distribution_frame.show(50))
+  distribution_frame = distribution_frame.withColumn('female_distribution', distribution_frame['f_count'] / distribution_frame['count'])
 
   return distribution_frame
 
@@ -65,7 +69,7 @@ def main():
     example.gender == 'F'
   ).groupBy('state', 'arrival_month').count()
 
-  sex_distirbution_aggregate = create_sex_distribution_frame(example_sex_aggregate, example_female_aggregate)
+  sex_distirbution_aggregate = create_sex_distribution_frame(logger, example_sex_aggregate, example_female_aggregate)
 
   logger.error(example_age_aggregate.show(50))
   logger.error(example_sex_aggregate.show(50))
