@@ -12,11 +12,11 @@ SOURCE_VIRTUAL_ENV= 'source /home/hadoop/capstone-venv/bin/activate && '
 default_args = {
   'owner': 'daniel miller/Open Source',
   'start_date': datetime(2018, 1, 12),
-  # 'retries': 1,
-  # # 'retry_delay': timedelta(minutes=5),
+  'retries': 1,
+  'retry_delay': timedelta(minutes=5),
   'email_on_failure': False,
   'depends_on_past': False,
-  # 'retries': 3
+  'retries': 3
 }
 
 dag = DAG('capstone_project_dag', default_args=default_args, description='capstone project dag', schedule_interval='@monthly', catchup=False)
