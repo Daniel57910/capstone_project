@@ -15,3 +15,5 @@ def main():
   if fact_quality_check.count() == 0 or fact_quality_check.count() is None:
     raise Exception('Loading fact summary failed')
 
+if __name__ == "__main__":
+  main()

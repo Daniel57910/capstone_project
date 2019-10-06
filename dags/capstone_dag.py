@@ -19,8 +19,7 @@ default_args = {
   # 'retries': 3
 }
 
-dag = DAG(
-  'sparkify_dag', default_args=default_args, description='First Dag', schedule_interval='@hourly', catchup=False)
+dag = DAG('capstone_project_dag', default_args=default_args, description='capstone project dag', schedule_interval='@monthly', catchup=False)
 
 sync_dataset= BashOperator(
   task_id='sync_dataset',
@@ -52,11 +51,17 @@ generate_immigration_demographic_summary = BashOperator(
   dag=dag
 )
 
-fact_data_quality_check = BashOperator(
-  task_id='fact_data_quality_check',
-  bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit --packages saurfang:spark-sas7bdat:2.0.0-s_2.10 {SPARK_PROJECT_PATH}/fact_data_quality_check.py',
+dimension_data_quality_check = BashOperator(
+  task_id='dimension_data_quality_check',
+  bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit {SPARK_PROJECT_PATH}/dimension_data_quality_check.py',
   dag=dag
 )
 
-sync_dataset >> unzip_dataset >> [generate_city_and_temperature_dimension_data, generate_immigration_dimension_data] >> generate_immigration_demographic_summary
-generate_immigration_demographic_summary >> fact_data_quality_check
+fact_data_quality_check = BashOperator(
+  task_id='fact_data_quality_check',
+  bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit {SPARK_PROJECT_PATH}/fact_data_quality_check.py',
+  dag=dag
+)
+
+sync_dataset >> unzip_dataset >> [generate_city_and_temperature_dimension_data, generate_immigration_dimension_data] >> dimension_data_quality_check 
+dimension_data_quality_check >> generate_immigration_demographic_summary >> fact_data_quality_check
