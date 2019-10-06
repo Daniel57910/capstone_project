@@ -16,7 +16,6 @@ default_args = {
   'retry_delay': timedelta(minutes=5),
   'email_on_failure': False,
   'depends_on_past': False,
-  'retries': 3
 }
 
 dag = DAG('capstone_project_dag', default_args=default_args, description='capstone project dag', schedule_interval='@monthly', catchup=False)
@@ -47,7 +46,7 @@ generate_immigration_dimension_data = BashOperator(
 
 generate_immigration_demographic_summary = BashOperator(
   task_id='generate_fact_summary_data_of_immigration_temperature_demographics',
-  bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit --packages {SPARK_PROJECT_PATH}/create_immigration_demographic_summary.py',
+  bash_command =SOURCE_VIRTUAL_ENV + f'spark-submit {SPARK_PROJECT_PATH}/create_immigration_demographic_summary.py',
   dag=dag
 )
 
